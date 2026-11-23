@@ -1,21 +1,25 @@
 /* Scarlett Preview — login shell styles
-   Brand: magenta #BF40BF (accent) + deep purple #301934 (accent/panels),
-   white text on a near-black stage. Purple is used as an accent, never
-   as a wall-to-wall background. */
+   Color scheme derived from the approved Scarlett Automation logo
+   (extracted from apps/web/public/scarlett-automation-logo.jpg):
+   emblem violet #784890 / #603078 (highlights #9060c0-#a878c0) over the
+   logo panel's dark violet #180030. Owner instruction 2026-11-23: the
+   password screen uses the logo's colors. White text, near-black stage. */
 
 :root {
-  --magenta: #bf40bf;
-  --magenta-soft: #d98bd9;
-  --plum: #301934;
+  --logo-violet: #784890;       /* emblem swirl core */
+  --logo-violet-deep: #603078;  /* darker swirl tone */
+  --logo-violet-bright: #9060c0;/* highlight tone */
+  --logo-violet-lilac: #b795d6; /* brightened text-scale tone from the emblem */
+  --logo-panel: #180030;        /* logo panel dark violet */
   --ink: #ffffff;
-  --ink-dim: #cfc3dd;
-  --ink-faint: #9a8bad;
-  --stage-0: #0c060e;
-  --stage-1: #150a18;
-  --field: #1b1220;
-  --field-border: #3a2650;
+  --ink-dim: #d6cbe2;
+  --ink-faint: #9c90b4;
+  --stage-0: #0a0510;
+  --stage-1: #120818;
+  --field: #15101f;
+  --field-border: #372a4e;
   --error: #ff8b8b;
-  --ok-focus: var(--magenta);
+  --ok-focus: var(--logo-violet-bright);
 }
 
 * { box-sizing: border-box; }
@@ -30,25 +34,25 @@ body {
   font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(1100px 600px at 85% -10%, rgba(191, 64, 191, 0.14), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(48, 25, 52, 0.55), transparent 60%),
+    radial-gradient(1100px 600px at 85% -10%, rgba(120, 72, 144, 0.16), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(24, 0, 48, 0.55), transparent 60%),
     radial-gradient(1200px 800px at 50% 50%, var(--stage-1), var(--stage-0));
   -webkit-font-smoothing: antialiased;
 }
 
-/* slow drifting magenta bloom — decorative accent layer */
+/* slow drifting violet bloom — decorative accent layer */
 .bloom {
   position: fixed;
   width: 46vmax; height: 46vmax;
   border-radius: 50%;
   filter: blur(120px);
-  opacity: 0.16;
+  opacity: 0.15;
   pointer-events: none;
   z-index: 0;
-  background: radial-gradient(circle at 40% 40%, var(--magenta), transparent 60%);
+  background: radial-gradient(circle at 40% 40%, var(--logo-violet), transparent 60%);
 }
 .bloom.b1 { top: -18vmax; right: -12vmax; animation: drift1 26s ease-in-out infinite alternate; }
-.bloom.b2 { bottom: -20vmax; left: -14vmax; background: radial-gradient(circle at 60% 60%, #6d2a75, transparent 65%); opacity: 0.12; animation: drift2 32s ease-in-out infinite alternate; }
+.bloom.b2 { bottom: -20vmax; left: -14vmax; background: radial-gradient(circle at 60% 60%, var(--logo-violet-deep), transparent 65%); opacity: 0.12; animation: drift2 32s ease-in-out infinite alternate; }
 @keyframes drift1 { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-6vmax, 5vmax, 0) scale(1.08); } }
 @keyframes drift2 { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(5vmax, -4vmax, 0) scale(1.06); } }
 
@@ -69,7 +73,7 @@ body {
   padding: 34px 30px 26px;
   border-radius: 22px;
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
-  border: 1px solid rgba(191, 64, 191, 0.30);
+  border: 1px solid rgba(120, 72, 144, 0.34);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -89,13 +93,13 @@ body {
   border-radius: 20px;
   object-fit: cover;
   display: block;
-  border: 1px solid rgba(191, 64, 191, 0.45);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(191, 64, 191, 0.10);
+  border: 1px solid rgba(144, 96, 192, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(120, 72, 144, 0.10);
 }
 .logo-glow {
   position: absolute; inset: -14px;
   border-radius: 28px;
-  background: radial-gradient(circle, rgba(191, 64, 191, 0.28), transparent 70%);
+  background: radial-gradient(circle, rgba(144, 96, 192, 0.28), transparent 70%);
   z-index: -1;
   animation: pulse 5s ease-in-out infinite;
 }
@@ -104,7 +108,7 @@ body {
 .brand {
   margin: 0 0 6px;
   text-align: center;
-  color: var(--magenta-soft);
+  color: var(--logo-violet-lilac);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.42em;
@@ -136,14 +140,14 @@ h1 {
   margin: 0 0 20px;
   padding: 13px 16px 12px;
   border-radius: 14px;
-  background: linear-gradient(160deg, rgba(48, 25, 52, 0.75), rgba(48, 25, 52, 0.35));
-  border: 1px solid rgba(191, 64, 191, 0.35);
+  background: linear-gradient(160deg, rgba(24, 0, 48, 0.78), rgba(24, 0, 48, 0.38));
+  border: 1px solid rgba(120, 72, 144, 0.38);
 }
 .client-label {
   font-size: 10px; font-weight: 700;
   letter-spacing: 0.34em; text-indent: 0.34em;
   text-transform: uppercase;
-  color: var(--magenta-soft);
+  color: var(--logo-violet-lilac);
 }
 .client-name {
   font-size: 19px; font-weight: 650; letter-spacing: 0.01em;
@@ -177,7 +181,7 @@ h1 {
 #password::placeholder { color: #7d6f92; }
 #password:focus {
   border-color: var(--ok-focus);
-  box-shadow: 0 0 0 3px rgba(191, 64, 191, 0.22);
+  box-shadow: 0 0 0 3px rgba(144, 96, 192, 0.22);
 }
 #password::-ms-reveal { display: none; }
 
@@ -193,7 +197,7 @@ h1 {
   color: var(--ink-faint);
   transition: color 0.2s ease, background 0.2s ease;
 }
-.toggle:hover { color: var(--magenta-soft); background: rgba(191, 64, 191, 0.12); }
+.toggle:hover { color: var(--logo-violet-bright); background: rgba(120, 72, 144, 0.14); }
 .toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 .error {
@@ -216,8 +220,8 @@ h1 {
 .spinner {
   width: 15px; height: 15px;
   border-radius: 50%;
-  border: 2px solid rgba(191, 64, 191, 0.25);
-  border-top-color: var(--magenta);
+  border: 2px solid rgba(144, 96, 192, 0.25);
+  border-top-color: var(--logo-violet-bright);
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -233,14 +237,14 @@ h1 {
   text-indent: 0.12em;
   text-transform: uppercase;
   color: #fff;
-  background: linear-gradient(135deg, var(--magenta) 0%, #8a2f97 100%);
+  background: linear-gradient(135deg, var(--logo-violet-bright) 0%, var(--logo-violet-deep) 100%);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 13px;
   cursor: pointer;
-  box-shadow: 0 14px 34px rgba(191, 64, 191, 0.28);
+  box-shadow: 0 14px 34px rgba(96, 48, 120, 0.35);
   transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
 }
-.cta:hover:not(:disabled) { filter: brightness(1.09); transform: translateY(-1px); box-shadow: 0 18px 40px rgba(191, 64, 191, 0.38); }
+.cta:hover:not(:disabled) { filter: brightness(1.09); transform: translateY(-1px); box-shadow: 0 18px 40px rgba(96, 48, 120, 0.45); }
 .cta:active:not(:disabled) { transform: translateY(1px); }
 .cta:disabled { opacity: 0.6; cursor: default; transform: none; }
 
@@ -252,7 +256,7 @@ h1 {
   text-align: center;
 }
 .fineprint + .fineprint { margin-top: 8px; }
-.locklink { color: var(--magenta-soft); text-decoration: underline; }
+.locklink { color: var(--logo-violet-lilac); text-decoration: underline; }
 .locklink:hover { color: #fff; }
 
 .foot {
@@ -260,7 +264,7 @@ h1 {
   color: var(--ink-faint);
   letter-spacing: 0.02em;
 }
-.foot b { color: var(--magenta-soft); font-weight: 700; }
+.foot b { color: var(--logo-violet-lilac); font-weight: 700; }
 
 @media (max-width: 420px) {
   .card { padding: 28px 22px 22px; }
