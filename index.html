@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; form-action 'self'; base-uri 'none'">
+<title>Website Preview Login — Scarlett Automation</title>
+<link rel="stylesheet" href="./sp-style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23301934'/%3E%3Cpath d='M8 11V8.5a4 4 0 0 1 8 0V11' fill='none' stroke='%23BF40BF' stroke-width='1.8'/%3E%3Crect x='6' y='11' width='12' height='8' rx='2' fill='%23BF40BF'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="bloom b1" aria-hidden="true"></div>
+<div class="bloom b2" aria-hidden="true"></div>
+<main class="stage">
+  <section class="card" aria-labelledby="headline">
+    <div class="logo-frame">
+      <img class="logo" id="logo" src="./scarlett-logo.jpg" alt="Scarlett Automation logo">
+      <span class="logo-glow" aria-hidden="true"></span>
+    </div>
+    <p class="brand">Scarlett Automation</p>
+    <h1 id="headline">Website Preview Login</h1>
+    <p class="lede">Login to see your website.</p>
+
+    <div class="client-badge">
+      <span class="client-label">Previewing</span>
+      <span class="client-name" id="client-name">…</span>
+    </div>
+
+    <form id="login-form" autocomplete="off">
+      <label class="field-label" for="password">Password</label>
+      <div class="pw-row">
+        <input id="password" type="password" name="password"
+               inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false"
+               placeholder="Enter the preview password" autocomplete="off" aria-describedby="error-msg">
+        <button type="button" class="toggle" id="toggle-visibility" aria-label="Show password" aria-pressed="false">
+          <svg class="ic-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+          <svg class="ic-eye-off" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M2 12s3.6-6.5 10-6.5c2 0 3.7.6 5.2 1.5M22 12s-3.6 6.5-10 6.5c-2 0-3.7-.6-5.2-1.5"/><line x1="4" y1="20" x2="20" y2="4"/></svg>
+        </button>
+      </div>
+      <p id="error-msg" class="error" role="alert" hidden>Incorrect password. Access denied.</p>
+      <button id="submit-btn" type="submit" class="cta">Login to View Website</button>
+      <p id="status-msg" class="status" role="status" hidden>
+        <span class="spinner" aria-hidden="true"></span><span id="status-text">Verifying…</span>
+      </p>
+      <p id="blocked-msg" class="blocked" role="status" hidden>This preview is not available right now. Please contact Scarlett Automation.</p>
+    </form>
+
+    <p class="fineprint">Preview access is password-protected. This temporary preview link can be revoked at any time.
+      To end an open preview session on this device, open <a class="locklink" href="./lock">the lock link</a>.</p>
+    <p class="fineprint lockhint" hidden>This preview's session is still open in another tab of this device — opening
+      <a class="locklink" href="./lock">the lock link</a> ends it everywhere.</p>
+  </section>
+  <footer class="foot">Powered by <b>Scarlett&nbsp;Automation</b></footer>
+</main>
+<script type="module" src="./sp-app.js"></script>
+</body>
+</html>
