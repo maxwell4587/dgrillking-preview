@@ -1,10 +1,16 @@
 /* Scarlett Preview — login application logic (public shell).
-   Runs BEFORE authentication on every visit. It never stores the password
-   and never persists derived key material: a page reload always requires
-   login again. */
+   Runs BEFORE authentication on every visit. It never stores the password.
+   After a verified unlock it hands the derived key to the service worker for
+   this tab and keeps the key bits in this tab's sessionStorage, so a reload
+   of the same tab resumes without re-login. Session storage is never shared
+   with another tab, is re-verified against the encrypted routing table at
+   every resume, and is dropped when the tab closes, when the session ends
+   through /lock, when cleared site data removes it, or if it ever fails
+   verification. */
 
 const enc = s => new TextEncoder().encode(s);
 const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const toB64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
 
 const $ = id => document.getElementById(id);
 const form = $('login-form');
@@ -16,6 +22,18 @@ const submitBtn = $('submit-btn');
 const toggleBtn = $('toggle-visibility');
 
 let manifest = null;
+
+/* The login shell is the unauthenticated face of the preview. Whatever
+   session record this tab still carries is dropped here: /lock lands on this
+   document, as does any navigation that failed verification, and a deliberate
+   login on this screen must never silently inherit an old key. */
+function clearSessionRecord() {
+  try {
+    sessionStorage.removeItem('spv-k');
+    sessionStorage.removeItem('spv-v');
+  } catch { /* storage unavailable: nothing to clear */ }
+}
+clearSessionRecord();
 
 function showError(msg) {
   errEl.textContent = msg || 'Incorrect password. Access denied.';
@@ -50,14 +68,18 @@ async function loadShell() {
 }
 
 async function deriveKey(password, { iterations, salt }) {
-  const material = await crypto.subtle.importKey('raw', enc(password), 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey(
+  /* Derive the raw 256-bit key and import a non-extractable CryptoKey: the
+     key used for crypto cannot be dumped from devtools, while the raw bits
+     exist in this tab only long enough to base64-encode them into the tab's
+     session record (spv-k), which lets the SAME tab resume after a
+     service-worker restart without re-typing anything. */
+  const material = await crypto.subtle.importKey('raw', enc(password), 'PBKDF2', false, ['deriveBits']);
+  const raw = await crypto.subtle.deriveBits(
     { name: 'PBKDF2', salt: unb64(salt), iterations, hash: 'SHA-256' },
-    material,
-    { name: 'AES-GCM', length: 256 },
-    false, // non-extractable: cannot be dumped from devtools
-    ['encrypt', 'decrypt'],
+    material, 256,
   );
+  const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+  return { key, keyB64: toB64(raw) };
 }
 
 async function decryptTree(key, manifest) {
@@ -72,9 +94,10 @@ async function decryptTree(key, manifest) {
   return JSON.parse(new TextDecoder().decode(plain));
 }
 
-/* Browsing session design: the service worker's own unlock state (worker
-   memory) is the session. No cookies and no storage hold any capability, so
-   a terminated or restarted worker always locks the gate again. */
+/* Browsing session design: each tab's session is its own sessionStorage
+   record (the derived key, tab-scoped) plus a per-tab key binding in the
+   service worker. A new tab never sees this tab's record and always shows
+   the login; a reload of this tab re-arms the worker transparently. */
 
 async function registerAndHandshake(key, tree, manifest) {
   const reg = await navigator.serviceWorker.register('./sp-sw.js', { scope: './' });
@@ -82,10 +105,10 @@ async function registerAndHandshake(key, tree, manifest) {
   const worker = reg.active || navigator.serviceWorker.controller;
   if (!worker) throw new Error('service worker unavailable');
 
-  /* Deliver the key + routing table and WAIT for both acknowledgements.
-     The worker's unlock state IS the browsing session (worker-memory
-     lifetime): navigating before the worker confirms state would leave the
-     next document hitting a stateless worker. */
+  /* Deliver the key + routing table and WAIT for both acknowledgements. The
+     worker binds the key per tab, and every document of this tab re-binds it
+     through the resume step as needed; navigating before the worker confirms
+     state would leave the next document hitting an unbound worker. */
   const awaitAck = (ackType, message) => new Promise((resolve, reject) => {
     const ch = new MessageChannel();
     ch.port1.onmessage = e => (e.data && e.data.type === ackType ? resolve() : reject(new Error('handshake mismatch')));
@@ -117,13 +140,21 @@ form.addEventListener('submit', async ev => {
     manifest = manifest || await loadManifest();
 
     setStatus('Deriving key…');
-    const key = await deriveKey(password, manifest.kdf);
+    const { key, keyB64 } = await deriveKey(password, manifest.kdf);
 
     setStatus('Decrypting preview…');
     const tree = await decryptTree(key, manifest); // GCM auth == password check
 
     setStatus('Opening preview…');
     await registerAndHandshake(key, tree, manifest);
+    /* Write the tab's session record only after the handshake was fully
+       acknowledged: from this point a reload of THIS tab resumes without a
+       re-login, while a new tab (no session record of its own) always sees
+       the login. */
+    try {
+      sessionStorage.setItem('spv-k', keyB64);
+      sessionStorage.setItem('spv-v', '2');
+    } catch { /* storage unavailable: this tab simply re-logins after reloads */ }
     redirectToProtected();
   } catch (e) {
     clearStatus();
